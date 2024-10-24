@@ -24,19 +24,28 @@ func snippetViewHandler(w http.ResponseWriter, r *http.Request) {
 // Add a snippetCreate handler function
 func snippetCreateHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		// Use the Header().Set() method to add an 'Allow: POST' header to the
-		// response header map. The first parameter is the header name, and
-		// the second parameter is the header value.
-		w.Header().Set("Allow", "POST")
+		// Set a new cache-control header. If an existing "Cache-Control" header exists
+		// it will be overwritten.		w.Header().Set("Allow", "POST")
 
-		// If it's not, use the w.WriteHeader() method to send a 405 status
-		// code and the w.Write() method to write a "Method Not Allowed"
-		// response body. We then return from the function so that the
-		// subsequent code is not executed.
+		// Header manipulations
+
+		// In contrast, the Add() method appends a new "Cache-Control" header and can
+		// be called multiple times.
+		w.Header().Add("Cache-Control", "public")
+		w.Header().Add("Cache-Control", "max-age-31536000")
+
+		// Delete all values for the "Cache-Control" header.
+		w.Header().Del("Cache-Control")
+
+		// Retrieve the first value for the "Cache-Control" header.
+		w.Header().Get("Cache-Control")
+
+		// Retrieve a slice of all values for the "Cache-Control" header.
+		w.Header().Values("Cache-Control")
 
 		// w.WriteHeader(405)
 		// w.Write([]byte("Method not allowed"))
-		// Also...
+		// or...
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 
 		return
